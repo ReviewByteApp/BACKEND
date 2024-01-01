@@ -15,7 +15,8 @@ router.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 router.get("/", async (req, res) => {
   try {
-    const admins = await Admin.find({}).select("-password");
+    const admins = await Admin.find({});
+    // .select("-password")
     res.status(200).send(admins);
   } catch (ex) {
     res.status(500).send("Internal server error.");
@@ -58,7 +59,7 @@ router.post("/", upload.single("profilepicture"), async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", upload.single("profilepicture"), async (req, res) => {
   const { id } = req.params;
   const { name, password, email, category, location, description } = req.body;
   let profilePicture;
@@ -75,6 +76,7 @@ router.put("/:id", async (req, res) => {
     if (existingAdmin && existingAdmin._id.toString() !== id) {
       return res.status(400).send("Email already exists for another Admin");
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     let admin = await Admin.findByIdAndUpdate(id, {
       name,
@@ -91,6 +93,7 @@ router.put("/:id", async (req, res) => {
 
     res.status(200).send(admin);
   } catch (ex) {
+    console.log(ex);
     res.status(500).send("Internal server error.");
   }
 });
