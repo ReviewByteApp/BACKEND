@@ -2,10 +2,13 @@ const mongoose = require("mongoose");
 const express = require("express");
 const AdminRouter = require("./routers/admin");
 const AuthRouter = require("./routers/auth");
+const ServiceRouter = require("./routers/service");
+
 const app = express();
 
 app.use("/admin", AdminRouter);
 app.use("/auth", AuthRouter);
+app.use("/service", ServiceRouter);
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/review-app")
