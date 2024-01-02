@@ -25,9 +25,7 @@ const serviceSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  video: {
-    type: String,
-  },
+
   admin: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "admin",
