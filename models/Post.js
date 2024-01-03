@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const postSchema = mongoose.Schema({
-  name: {
+  title: {
     type: String,
     required: true,
   },
@@ -15,10 +15,7 @@ const postSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  price: {
-    type: Number,
-    required: true,
-  },
+
   video: {
     type: String,
     required: true,
