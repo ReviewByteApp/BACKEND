@@ -8,6 +8,19 @@ require("dotenv").config();
 const router = express.Router();
 router.use(express.json());
 
+/**
+ * @api {post} /auth Admin Authentication
+ * @apiName adminAuthenticate
+ * @apiGroup Admin
+ *
+ * @apiBody {String} password  password of the admin.
+ * @apiBody {String} email  email of the admin.
+ *
+ * @apiSuccess {Object[]} auth authObject
+ * @apiSuccess {String} auth.token The JSON Web Token (JWT) for authentication.
+ * @apiSuccess {String} auth.name The name of the admin user.
+ */
+
 router.post(
   "/",
   asyncMiddleware(async (req, res) => {

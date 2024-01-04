@@ -26,6 +26,10 @@ const customerSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  reviewCount: {
+    type: Number,
+    required: true,
+  },
 });
 
 const Customer = mongoose.model("customer", customerSchema);

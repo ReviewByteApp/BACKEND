@@ -17,7 +17,7 @@ const reviewSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  usefulCount: {
+  like: {
     type: Number,
     required: true,
   },
@@ -29,6 +29,20 @@ const reviewSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "admin",
   },
+  createdAt: {
+    type: Date,
+    default: Date.now, // Set the default value to the current timestamp
+  },
+  updatedAt: {
+    type: Date,
+    default: null, // Set the default value to null for the initial creation
+  },
+});
+
+// Middleware to update `updatedAt` whenever a document is updated
+reviewSchema.pre("save", function (next) {
+  this.updatedAt = new Date();
+  next();
 });
 
 const Review = mongoose.model("review", reviewSchema);

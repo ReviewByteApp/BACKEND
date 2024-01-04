@@ -14,6 +14,22 @@ router.use(express.json());
 
 router.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
+/**
+ * @api {get} /customer Request customer information
+ * @apiName GetCustomer
+ * @apiGroup Customer
+ *
+ *
+ * @apiSuccess {Object[]} customer customerObject
+ * @apiSuccess {String} customer.name  name of the customer.
+ * @apiSuccess {String} customer.country  country of the customer
+ * @apiSuccess {String} customer.city city of customer
+ * @apiSuccess {String} customer.profilePicture  profilePicture of the customer.
+ *@apiSuccess {String} customer.email  email of the customer.
+ * @apiSuccess {Number} customer.reviewCount  reviewCount of the customer.
+ * @apiSuccess {String} customer.password  password of the customer.
+ */
+
 router.get(
   "/",
   asyncMiddleware(async (req, res) => {
@@ -23,11 +39,27 @@ router.get(
   })
 );
 
+/**
+ * @api {post} /post Create new customer
+ * @apiName CreateCustomer
+ * @apiGroup Post
+ *
+ *
+ * @apiSuccess {Object[]} customer postObject
+ * @apiSuccess {String} customer.name  name of the customer.
+ * @apiSuccess {String} customer.country  country of the customer
+ * @apiSuccess {String} customer.city city of customer
+ * @apiSuccess {String} customer.profilePicture  profilePicture of the customer.
+ *@apiSuccess {String} customer.email  email of the customer.
+ * @apiSuccess {Number} customer.reviewCount reviewCount of the customer.
+ * @apiSuccess {String} customer.password  password of the customer.
+ */
+
 router.post(
   "/",
   upload.single("profilePicture"),
   asyncMiddleware(async (req, res) => {
-    const { name, city, password, email, country } = req.body;
+    const { name, city, password, email, country, reviewCount } = req.body;
     let profilePicture;
 
     if (req.file) {
@@ -49,6 +81,7 @@ router.post(
       password: hashedPassword,
       email,
       country,
+      reviewCount,
       profilePicture: profilePicture,
     });
 
@@ -57,16 +90,112 @@ router.post(
   })
 );
 
+/**
+ * @api {put} /customer/security/:id update customer passwords
+ * @apiName UpdatePassword
+ * @apiGroup Customer
+ *
+ *@apiParam {objectId} id customer unique ID.
+ *
+ * @apiSuccess {Object[]} customer customerObject
+ * @apiSuccess {String} customer.password  password of the customer.
+ * @apiSuccess {String} customer.email  email of the customer.
+ */
+
+router.put(
+  "/security/:id",
+  asyncMiddleware(async (req, res) => {
+    const { id } = req.params;
+    const { password, email } = req.body;
+
+    const existingCustomer = await Customer.findOne({ email });
+    if (existingCustomer && existingCustomer._id.toString() !== id) {
+      return res.status(400).send("Email already exists for another customer");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    let customer = await Customer.findByIdAndUpdate(
+      id,
+      {
+        password: hashedPassword,
+        email,
+      },
+      { new: true }
+    );
+
+    if (!customer)
+      return res.status(404).send("Customer not found with this id");
+
+    res.status(200).send(customer);
+  })
+);
+
+/**
+ * @api {put} /customer/info/:id update customer info
+ * @apiName UpdateCustomer
+ * @apiGroup Customer
+ *
+ *@apiParam {objectId} id customer unique ID.
+ *
+ * @apiSuccess {Object[]} customer customerObject
+ * @apiSuccess {String} customer.name name of the customer.
+ * @apiSuccess {String} customer.country country of the customer.*@apiSuccess {String} customer.city city of the customer.
+ * @apiSuccess {String} customer.profilePicture  profilePicture of the customer.
+ */
+
+router.put(
+  "/info/:id",
+  upload.single("profilePicture"),
+  asyncMiddleware(async (req, res) => {
+    const { id } = req.params;
+    const { name, city, country } = req.body;
+    let profilePicture;
+
+    if (req.file) {
+      const { originalname, path } = req.file;
+      const parts = originalname.split(".");
+      const ext = parts[parts.length - 1];
+      const newPath = path + "." + ext;
+      fs.renameSync(path, newPath);
+      profilePicture = newPath;
+    }
+
+    let customer = await Customer.findByIdAndUpdate(
+      id,
+      {
+        name,
+        city,
+        country,
+      },
+      { new: true }
+    );
+
+    if (!customer)
+      return res.status(404).send("Customer not found with this id");
+
+    res.status(200).send(customer);
+  })
+);
+
+/**
+ * @api {delete} /customer/:id Delete customer
+ * @apiName DeleteCustomer
+ * @apiGroup Customer
+ *
+ * @apiParam {objectId} id customer unique ID.
+ *
+ * @apiSuccess {Object[]} customer customer deleted successfully
+ */
+
 router.delete(
   "/:id",
   asyncMiddleware(async (req, res) => {
     const { id } = req.params;
+    const post = await Customer.findByIdAndDelete(id);
+    if (!post) return res.status(404).send("Customer not found with this id");
 
-    const customer = await Customer.findByIdAndDelete(id);
-    if (!customer)
-      return res.status(404).send("customer not fund with this id");
-
-    res.status(200).send("customer deleted successfully");
+    res.status(200).send("Customer deleted successfully");
   })
 );
 

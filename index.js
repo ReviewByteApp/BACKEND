@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const AdminRouter = require("./routers/admin");
 const AuthRouter = require("./routers/auth");
-const ServiceRouter = require("./routers/service");
+
 const PostRouter = require("./routers/post");
 const categoryRouter = require("./routers/category");
 const SubcategoryRouter = require("./routers/subcategory");
@@ -15,7 +15,7 @@ const app = express();
 
 app.use("/admin", AdminRouter);
 app.use("/auth", AuthRouter);
-app.use("/service", ServiceRouter);
+
 app.use("/post", PostRouter);
 app.use("/category", categoryRouter);
 app.use("/subcategory", SubcategoryRouter);

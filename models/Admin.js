@@ -86,12 +86,12 @@ const adminSchema = mongoose.Schema({
   },
 });
 
+// Middleware to update `updatedAt` whenever a document is updated
+adminSchema.pre("save", function (next) {
+  this.updatedAt = new Date();
+  next();
+});
+
 const Admin = mongoose.model("admin", adminSchema);
 
 module.exports = Admin;
-
-// Middleware to update `updatedAt` whenever a document is updated
-// adminSchema.pre("save", function (next) {
-//   this.updatedAt = new Date();
-//   next();
-// });

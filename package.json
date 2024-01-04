@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "apidoc": {
+    "title": "ReviewByte apidoc",
+    "url": "http://localhost:3001"
+  },
   "scripts": {
     "start": "nodemon index.js"
   },
